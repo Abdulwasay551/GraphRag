@@ -1,0 +1,48 @@
+<div class="node-card" data-node-id="{{ node.id if node.id else node.get('id', '') }}">
+    <div class="node-header">
+        {% set labels = node.labels if node.labels else node.get('labels', []) %}
+        {% set label = labels[0] if labels else 'Node' %}
+        <span class="node-label {{ label.lower() }}">{{ label }}</span>
+        
+        {% set score = node.score if node.score else node.get('score') %}
+        {% if score %}
+            <span class="node-score">{{ "%.2f"|format(score) }}</span>
+        {% endif %}
+    </div>
+    
+    <div class="node-body">
+        {% set properties = node.properties if node.properties else node.get('properties', {}) %}
+        
+        {% if properties.get('name') %}
+            <h4>{{ properties.name }}</h4>
+        {% elif properties.get('title') %}
+            <h4>{{ properties.title }}</h4>
+        {% else %}
+            <h4>{{ properties.get('id', 'Unknown') }}</h4>
+        {% endif %}
+        
+        <div class="node-properties">
+            {% for key, value in properties.items() %}
+                {% if key not in ['id', 'name', 'title', 'embedding', 'text'] and value %}
+                    <div class="property">
+                        <strong>{{ key }}:</strong> 
+                        {% if value is string and value|length > 100 %}
+                            {{ value[:100] }}...
+                        {% else %}
+                            {{ value }}
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        
+        {% if properties.get('text') %}
+            <div class="node-text">
+                <details>
+                    <summary>View text content</summary>
+                    <p>{{ properties.text }}</p>
+                </details>
+            </div>
+        {% endif %}
+    </div>
+</div>

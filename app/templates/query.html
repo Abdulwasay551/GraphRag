@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% block title %}Query - GraphRAG{% endblock %}
+{% block content %}
+{% include "components/navbar_auth.html" %}
+
+<div class="min-h-screen bg-gray-50 dark:bg-dark-100 px-4 py-8" x-data="queryData()">
+    <div class="max-w-4xl mx-auto">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold mb-2">Query Your Knowledge Graph</h1>
+            <p class="text-gray-600 dark:text-gray-400">Ask questions in natural language</p>
+        </div>
+        
+        <div class="glass dark:glass-dark rounded-2xl shadow-2xl overflow-hidden">
+            <div class="h-[600px] overflow-y-auto p-6 space-y-4" x-ref="messagesContainer">
+                <template x-if="messages.length === 0">
+                    <div class="flex items-center justify-center h-full text-center">
+                        <div>
+                            <div class="w-20 h-20 rounded-full bg-gradient-to-br from-primary-100 to-primary-200 dark:from-primary-900/30 dark:to-primary-800/30 flex items-center justify-center mx-auto mb-6">
+                                <i class="fas fa-comments text-4xl text-primary-600"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-2">Start a Conversation</h3>
+                            <p class="text-gray-600 dark:text-gray-400 mb-6">Ask questions about your knowledge graph</p>
+                            <div class="flex flex-wrap gap-2 justify-center">
+                                <button @click="sendMessage('What entities exist in my graph?')"
+                                    class="px-4 py-2 glass dark:glass-dark rounded-lg text-sm hover:shadow-lg transition">
+                                    What entities exist?
+                                </button>
+                                <button @click="sendMessage('Show me recent relationships')"
+                                    class="px-4 py-2 glass dark:glass-dark rounded-lg text-sm hover:shadow-lg transition">
+                                    Show relationships
+                                </button>
+                                <button @click="sendMessage('Summarize my documents')"
+                                    class="px-4 py-2 glass dark:glass-dark rounded-lg text-sm hover:shadow-lg transition">
+                                    Summarize documents
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+                
+                <template x-for="(message, index) in messages" :key="index">
+                    <div :class="message.role === 'user' ? 'flex justify-end' : 'flex justify-start'">
+                        <div :class="message.role === 'user' 
+                            ? 'max-w-[80%] px-6 py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-2xl rounded-br-md shadow-lg' 
+                            : 'max-w-[80%] px-6 py-4 bg-white dark:bg-dark-200 rounded-2xl rounded-bl-md shadow-lg'">
+                            <div class="flex items-start mb-2">
+                                <div :class="message.role === 'user' ? 'w-8 h-8 rounded-full bg-white/20 flex items-center justify-center mr-3' : 'w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center mr-3'">
+                                    <i :class="message.role === 'user' ? 'fas fa-user text-white text-sm' : 'fas fa-robot text-white text-sm'"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="font-semibold mb-1" x-text="message.role === 'user' ? 'You' : 'Assistant'"></div>
+                                    <div class="text-sm opacity-75" x-text="formatTime(message.timestamp)"></div>
+                                </div>
+                            </div>
+                            <div class="prose prose-sm dark:prose-invert max-w-none" x-html="formatMessage(message.content)"></div>
+                            <template x-if="message.entities && message.entities.length > 0">
+                                <div class="mt-4 pt-4 border-t border-white/10">
+                                    <div class="text-xs font-semibold mb-2 opacity-75">Referenced Entities:</div>
+                                    <div class="flex flex-wrap gap-2">
+                                        <template x-for="entity in message.entities" :key="entity.id">
+                                            <span class="px-2 py-1 bg-white/10 rounded-lg text-xs" x-text="entity.name"></span>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+                
+                <template x-if="isTyping">
+                    <div class="flex justify-start">
+                        <div class="px-6 py-4 bg-white dark:bg-dark-200 rounded-2xl rounded-bl-md shadow-lg">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-2 h-2 bg-primary-600 rounded-full animate-bounce"></div>
+                                <div class="w-2 h-2 bg-primary-600 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                                <div class="w-2 h-2 bg-primary-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+            
+            <div class="border-t border-gray-200 dark:border-dark-300 p-4">
+                <form @submit.prevent="sendMessage()" class="flex gap-3">
+                    <input type="text" x-model="inputMessage" :disabled="isTyping"
+                        class="flex-1 px-6 py-4 bg-white dark:bg-dark-200 border-2 border-gray-200 dark:border-dark-300 rounded-xl focus:border-primary-500 focus:ring-2 focus:ring-primary-200 dark:focus:ring-primary-900/30 outline-none transition"
+                        placeholder="Ask a question about your knowledge graph...">
+                    <button type="submit" :disabled="!inputMessage.trim() || isTyping"
+                        class="px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                        <i :class="isTyping ? 'fas fa-spinner fa-spin' : 'fas fa-paper-plane'"></i>
+                    </button>
+                </form>
+                <div class="mt-2 text-xs text-gray-500 text-center">
+                    AI responses are generated and may not be 100% accurate
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="glass dark:glass-dark rounded-xl p-4 text-center">
+                <i class="fas fa-lightbulb text-2xl text-yellow-500 mb-2"></i>
+                <div class="text-sm font-semibold mb-1">Smart Suggestions</div>
+                <div class="text-xs text-gray-600 dark:text-gray-400">Context-aware responses</div>
+            </div>
+            <div class="glass dark:glass-dark rounded-xl p-4 text-center">
+                <i class="fas fa-project-diagram text-2xl text-purple-500 mb-2"></i>
+                <div class="text-sm font-semibold mb-1">Graph Context</div>
+                <div class="text-xs text-gray-600 dark:text-gray-400">Answers from your data</div>
+            </div>
+            <div class="glass dark:glass-dark rounded-xl p-4 text-center">
+                <i class="fas fa-history text-2xl text-blue-500 mb-2"></i>
+                <div class="text-sm font-semibold mb-1">Conversation History</div>
+                <div class="text-xs text-gray-600 dark:text-gray-400">Contextual follow-ups</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function queryData() {
+    return {
+        workspaceId: new URLSearchParams(window.location.search).get('workspace'),
+        messages: [],
+        inputMessage: '',
+        isTyping: false,
+        
+        async sendMessage(predefinedMessage) {
+            const message = predefinedMessage || this.inputMessage.trim();
+            if (!message) return;
+            
+            this.messages.push({
+                role: 'user',
+                content: message,
+                timestamp: new Date()
+            });
+            
+            this.inputMessage = '';
+            this.isTyping = true;
+            this.scrollToBottom();
+            
+            try {
+                const result = await window.api.request('/api/query/ask', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        query: message,
+                        workspace_id: this.workspaceId,
+                        max_depth: 2,
+                        top_k: 10
+                    })
+                });
+                
+                this.messages.push({
+                    role: 'assistant',
+                    content: result.answer || result.response || 'No response',
+                    entities: result.context_nodes || result.entities || [],
+                    timestamp: new Date()
+                });
+            } catch (error) {
+                this.messages.push({
+                    role: 'assistant',
+                    content: 'Sorry, I encountered an error processing your question. Please try again.',
+                    timestamp: new Date()
+                });
+                console.error('Query failed:', error);
+            } finally {
+                this.isTyping = false;
+                this.scrollToBottom();
+            }
+        },
+        
+        formatMessage(content) {
+            return content.replace(/\n/g, '<br>').replace(/`([^`]+)`/g, '<code>$1</code>');
+        },
+        
+        formatTime(date) {
+            return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        },
+        
+        scrollToBottom() {
+            this.$nextTick(() => {
+                const container = this.$refs.messagesContainer;
+                if (container) {
+                    container.scrollTop = container.scrollHeight;
+                }
+            });
+        }
+    }
+}
+</script>
+{% endblock %}

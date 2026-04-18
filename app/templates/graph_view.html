@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GraphRAG Knowledge Explorer</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔮 GraphRAG Knowledge Explorer</h1>
+            <p class="subtitle">Powered by Neo4j + Ollama Llama 3.2</p>
+        </header>
+        
+        <!-- Knowledge Base Info Panel -->
+        <div class="info-panel" id="info-panel" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h3 style="margin: 0 0 10px 0; font-size: 1.3em;">📚 Sample Knowledge Base Loaded</h3>
+                    <p style="margin: 5px 0; opacity: 0.95;">This database contains information about <strong>5 movies, multiple actors & directors, and genres</strong></p>
+                </div>
+                <button onclick="document.getElementById('info-panel').style.display='none'" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 1.1em;">✕</button>
+            </div>
+            
+            <div style="margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.15); border-radius: 8px; backdrop-filter: blur(10px);">
+                <h4 style="margin: 0 0 10px 0;">🎬 Try These Sample Queries:</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px;">
+                    <button onclick="document.getElementById('query-input').value='Who directed The Matrix?'; submitQuery();" style="background: rgba(255,255,255,0.9); border: none; padding: 10px; border-radius: 5px; cursor: pointer; text-align: left; color: #333; font-size: 0.9em; transition: all 0.2s;">
+                        → Who directed The Matrix?
+                    </button>
+                    <button onclick="document.getElementById('query-input').value='What movies did Christopher Nolan direct?'; submitQuery();" style="background: rgba(255,255,255,0.9); border: none; padding: 10px; border-radius: 5px; cursor: pointer; text-align: left; color: #333; font-size: 0.9em; transition: all 0.2s;">
+                        → What movies did Christopher Nolan direct?
+                    </button>
+                    <button onclick="document.getElementById('query-input').value='Tell me about Inception'; submitQuery();" style="background: rgba(255,255,255,0.9); border: none; padding: 10px; border-radius: 5px; cursor: pointer; text-align: left; color: #333; font-size: 0.9em; transition: all 0.2s;">
+                        → Tell me about Inception
+                    </button>
+                    <button onclick="document.getElementById('query-input').value='What Sci-Fi movies are in the database?'; submitQuery();" style="background: rgba(255,255,255,0.9); border: none; padding: 10px; border-radius: 5px; cursor: pointer; text-align: left; color: #333; font-size: 0.9em; transition: all 0.2s;">
+                        → What Sci-Fi movies are in the database?
+                    </button>
+                    <button onclick="document.getElementById('query-input').value='Who acted in Pulp Fiction?'; submitQuery();" style="background: rgba(255,255,255,0.9); border: none; padding: 10px; border-radius: 5px; cursor: pointer; text-align: left; color: #333; font-size: 0.9em; transition: all 0.2s;">
+                        → Who acted in Pulp Fiction?
+                    </button>
+                    <button onclick="document.getElementById('query-input').value='Which actors worked with Christopher Nolan?'; submitQuery();" style="background: rgba(255,255,255,0.9); border: none; padding: 10px; border-radius: 5px; cursor: pointer; text-align: left; color: #333; font-size: 0.9em; transition: all 0.2s;">
+                        → Which actors worked with Christopher Nolan?
+                    </button>
+                </div>
+            </div>
+            
+            <div style="margin-top: 12px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 5px; font-size: 0.9em;">
+                <strong>💾 Database Contents:</strong> Movies (The Matrix, Inception, Interstellar, The Dark Knight, Pulp Fiction) • People (Keanu Reeves, Leonardo DiCaprio, Christopher Nolan, Quentin Tarantino, and more) • Genres (Sci-Fi, Action, Crime)
+            </div>
+        </div>
+        
+        <div class="search-section">
+            <div class="search-box">
+                <input 
+                    type="text" 
+                    id="query-input" 
+                    placeholder="Ask a question about the knowledge graph..."
+                    onkeypress="if(event.key === 'Enter') submitQuery()"
+                />
+                <button onclick="submitQuery()" id="search-btn">
+                    <span id="search-icon">🔍</span>
+                    <span id="search-text">Search</span>
+                </button>
+            </div>
+            <div class="search-options">
+                <label>
+                    <span>Max Depth:</span>
+                    <select id="max-depth">
+                        <option value="1">1</option>
+                        <option value="2" selected>2</option>
+                        <option value="3">3</option>
+                    </select>
+                </label>
+                <label>
+                    <span>Top Results:</span>
+                    <select id="top-k">
+                        <option value="5">5</option>
+                        <option value="10" selected>10</option>
+                        <option value="20">20</option>
+                    </select>
+                </label>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="left-panel">
+                <div class="answer-section">
+                    <h2>💡 Answer</h2>
+                    <div id="answer-text" class="answer-box">
+                        {% if answer %}
+                            {{ answer }}
+                        {% else %}
+                            <p class="placeholder">Ask a question to explore the knowledge graph...</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div id="sources-section" style="display: none;">
+                        <h3>📚 Sources</h3>
+                        <div id="sources-list"></div>
+                    </div>
+                </div>
+                
+                <div class="stats-section">
+                    <h3>📊 Graph Statistics</h3>
+                    <div id="stats-content">
+                        <div class="stat-loading">Loading...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="right-panel">
+                <div class="graph-section">
+                    <h2>🌐 Knowledge Graph</h2>
+                    <div id="graph-container">
+                        <svg id="graph-svg"></svg>
+                    </div>
+                    <div class="graph-legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #4CAF50;"></div>
+                            <span>High Relevance</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #2196F3;"></div>
+                            <span>Medium Relevance</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #9E9E9E;"></div>
+                            <span>Low Relevance</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="context-section">
+                    <h3>🔗 Context Nodes</h3>
+                    <div id="context-nodes">
+                        {% if context_nodes %}
+                            {% for node in context_nodes %}
+                                {% include 'components/node_card.html' %}
+                            {% endfor %}
+                        {% else %}
+                            <p class="placeholder">Context nodes will appear here after a query...</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="{{ url_for('static', path='/js/graph_vis.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+This is a very small test document for GraphRAG.
+It contains minimal content to test the emergency mode processing.
+This document should process successfully without crashing the system.
+Testing the sequential processing with embeddings disabled.
+Total size is under 500 bytes to ensure safe processing.

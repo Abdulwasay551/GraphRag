@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block title %}GraphRAG - AI-Powered Knowledge Graphs{% endblock %}
+{% block content %}
+{% include "components/navbar_public.html" %}
+<div class="relative overflow-hidden">
+    <div class="absolute inset-0 gradient-animated opacity-10"></div>
+    <section class="relative min-h-screen flex items-center justify-center px-4">
+        <div class="max-w-7xl mx-auto text-center">
+            <div class="float mb-8">
+                <div class="inline-flex items-center px-4 py-2 rounded-full glass dark:glass-dark mb-6">
+                    <span class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
+                    <span class="text-sm font-medium">Now in Public Beta</span>
+                </div>
+            </div>
+            <h1 class="text-5xl md:text-7xl font-black mb-6 leading-tight">
+                Transform Documents into<br>
+                <span class="bg-gradient-to-r from-primary-600 via-purple-600 to-primary-800 bg-clip-text text-transparent">Intelligent Knowledge</span>
+            </h1>
+            <p class="text-xl md:text-2xl text-gray-600 dark:text-gray-400 mb-8 max-w-3xl mx-auto">
+                Build powerful knowledge graphs from your documents using AI. Query with natural language. Embed anywhere.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <a href="/register" class="px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white rounded-xl font-semibold text-lg shadow-2xl hover:shadow-3xl transform hover:scale-105 transition flex items-center">
+                    Get Started Free
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+                <a href="/docs" class="px-8 py-4 glass dark:glass-dark rounded-xl font-semibold text-lg hover:shadow-xl transition flex items-center">
+                    <i class="fas fa-book mr-2"></i>
+                    View Documentation
+                </a>
+            </div>
+            <div class="mt-16">
+                <div class="glass dark:glass-dark rounded-2xl p-2 inline-block shadow-2xl">
+                    <img src="https://placehold.co/1200x600/1a1a2e/a855f7?text=GraphRAG+Dashboard" alt="Dashboard" class="rounded-xl">
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<section id="features" class="py-20 px-4 bg-gray-50 dark:bg-dark-100">
+    <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl md:text-5xl font-bold mb-4">Powerful Features</h2>
+            <p class="text-xl text-gray-600 dark:text-gray-400">Everything you need to build intelligent knowledge systems</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="glass dark:glass-dark rounded-2xl p-8 hover:shadow-2xl transition transform hover:-translate-y-2">
+                <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center mb-6 shadow-lg">
+                    <i class="fas fa-file-upload text-white text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-4">Multi-Format Upload</h3>
+                <p class="text-gray-600 dark:text-gray-400">Support for PDF, Word, CSV, Excel, JSON, Markdown & HTML</p>
+            </div>
+            <div class="glass dark:glass-dark rounded-2xl p-8 hover:shadow-2xl transition transform hover:-translate-y-2">
+                <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center mb-6 shadow-lg">
+                    <i class="fas fa-project-diagram text-white text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-4">Custom Schemas</h3>
+                <p class="text-gray-600 dark:text-gray-400">Define your own entity types and relationships visually</p>
+            </div>
+            <div class="glass dark:glass-dark rounded-2xl p-8 hover:shadow-2xl transition transform hover:-translate-y-2">
+                <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-pink-500 to-pink-700 flex items-center justify-center mb-6 shadow-lg">
+                    <i class="fas fa-comments text-white text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-4">AI Query Interface</h3>
+                <p class="text-gray-600 dark:text-gray-400">Natural language queries powered by LLMs</p>
+            </div>
+            <div class="glass dark:glass-dark rounded-2xl p-8 hover:shadow-2xl transition transform hover:-translate-y-2">
+                <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center mb-6 shadow-lg">
+                    <i class="fas fa-code text-white text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-4">Embeddable Widget</h3>
+                <p class="text-gray-600 dark:text-gray-400">Drop-in chatbot widget for any website</p>
+            </div>
+            <div class="glass dark:glass-dark rounded-2xl p-8 hover:shadow-2xl transition transform hover:-translate-y-2">
+                <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center mb-6 shadow-lg">
+                    <i class="fas fa-download text-white text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-4">Multiple Exports</h3>
+                <p class="text-gray-600 dark:text-gray-400">Export as JSON, CSV, GraphML or Cypher</p>
+            </div>
+            <div class="glass dark:glass-dark rounded-2xl p-8 hover:shadow-2xl transition transform hover:-translate-y-2">
+                <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-yellow-500 to-yellow-700 flex items-center justify-center mb-6 shadow-lg">
+                    <i class="fas fa-users text-white text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-4">Team Workspaces</h3>
+                <p class="text-gray-600 dark:text-gray-400">Collaborate with your team in isolated workspaces</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="pricing" class="py-20 px-4">
+    <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl md:text-5xl font-bold mb-4">Simple, Transparent Pricing</h2>
+            <p class="text-xl text-gray-600 dark:text-gray-400">Start free, scale as you grow</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="glass dark:glass-dark rounded-2xl p-8 hover:shadow-2xl transition">
+                <div class="text-center mb-6">
+                    <h3 class="text-2xl font-bold mb-2">Free</h3>
+                    <div class="text-5xl font-black mb-2">$0</div>
+                    <p class="text-gray-600 dark:text-gray-400">Forever free</p>
+                </div>
+                <ul class="space-y-4 mb-8">
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-3"></i>1 Workspace</li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-3"></i>1,000 Nodes</li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-3"></i>Basic Support</li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-3"></i>All File Formats</li>
+                </ul>
+                <a href="/register" class="block w-full text-center py-3 border-2 border-primary-600 text-primary-600 rounded-xl font-semibold hover:bg-primary-50 dark:hover:bg-primary-900/20 transition">Get Started</a>
+            </div>
+            <div class="glass dark:glass-dark rounded-2xl p-8 hover:shadow-2xl transition relative border-4 border-primary-500">
+                <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-full text-sm font-bold">POPULAR</div>
+                <div class="text-center mb-6">
+                    <h3 class="text-2xl font-bold mb-2">Pro</h3>
+                    <div class="text-5xl font-black mb-2">$29</div>
+                    <p class="text-gray-600 dark:text-gray-400">per month</p>
+                </div>
+                <ul class="space-y-4 mb-8">
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-3"></i>10 Workspaces</li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-3"></i>50,000 Nodes</li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-3"></i>Priority Support</li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-3"></i>Custom Branding</li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-3"></i>API Access</li>
+                </ul>
+                <a href="/register" class="block w-full text-center py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-semibold hover:shadow-xl transform hover:scale-105 transition">Start Free Trial</a>
+            </div>
+            <div class="glass dark:glass-dark rounded-2xl p-8 hover:shadow-2xl transition">
+                <div class="text-center mb-6">
+                    <h3 class="text-2xl font-bold mb-2">Enterprise</h3>
+                    <div class="text-5xl font-black mb-2">Custom</div>
+                    <p class="text-gray-600 dark:text-gray-400">For large teams</p>
+                </div>
+                <ul class="space-y-4 mb-8">
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-3"></i>Unlimited Workspaces</li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-3"></i>Unlimited Nodes</li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-3"></i>24/7 Support</li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-3"></i>SSO & SAML</li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-3"></i>On-Premise Option</li>
+                </ul>
+                <a href="/contact" class="block w-full text-center py-3 border-2 border-primary-600 text-primary-600 rounded-xl font-semibold hover:bg-primary-50 dark:hover:bg-primary-900/20 transition">Contact Sales</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% include "components/footer.html" %}
+{% endblock %}

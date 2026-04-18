@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}About Us - GraphRAG{% endblock %}
+{% block content %}
+{% include "components/navbar_public.html" %}
+
+<div class="min-h-screen bg-gray-50 dark:bg-dark-100 px-4 py-16">
+    <div class="max-w-4xl mx-auto">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">About GraphRAG</h1>
+            <p class="text-xl text-gray-600 dark:text-gray-400">Building the future of intelligent knowledge management</p>
+        </div>
+        
+        <div class="glass dark:glass-dark rounded-2xl p-8 mb-8">
+            <h2 class="text-2xl font-bold mb-4">Our Mission</h2>
+            <p class="text-gray-600 dark:text-gray-400 mb-4">
+                At GraphRAG, we believe that knowledge should be accessible, interconnected, and intelligent. Our mission is to empower individuals and organizations to transform their unstructured documents into powerful, queryable knowledge graphs that reveal hidden insights and connections.
+            </p>
+            <p class="text-gray-600 dark:text-gray-400">
+                By combining the power of graph databases with advanced AI language models, we're making it possible for anyone to build sophisticated knowledge systems without deep technical expertise.
+            </p>
+        </div>
+        
+        <div class="glass dark:glass-dark rounded-2xl p-8 mb-8">
+            <h2 class="text-2xl font-bold mb-4">What We Do</h2>
+            <div class="space-y-4">
+                <div class="flex items-start">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center mr-4 flex-shrink-0">
+                        <i class="fas fa-brain text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold mb-2">AI-Powered Entity Extraction</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Automatically identify and extract entities, relationships, and concepts from your documents using state-of-the-art language models.</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center mr-4 flex-shrink-0">
+                        <i class="fas fa-project-diagram text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold mb-2">Interactive Graph Visualization</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Explore your knowledge in a visual, intuitive interface that reveals connections and patterns you might have missed.</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center mr-4 flex-shrink-0">
+                        <i class="fas fa-comments text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold mb-2">Natural Language Queries</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Ask questions in plain English and get intelligent answers powered by your knowledge graph and AI.</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center mr-4 flex-shrink-0">
+                        <i class="fas fa-code text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold mb-2">Embeddable Widgets</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Share your knowledge graphs with customers or team members through easy-to-embed chatbot widgets.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="glass dark:glass-dark rounded-2xl p-8 mb-8">
+            <h2 class="text-2xl font-bold mb-4">Our Technology</h2>
+            <p class="text-gray-600 dark:text-gray-400 mb-4">
+                GraphRAG is built on a modern, scalable technology stack:
+            </p>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div class="text-center p-4 bg-white dark:bg-dark-200 rounded-xl">
+                    <i class="fas fa-database text-3xl text-primary-600 mb-2"></i>
+                    <div class="font-semibold">Neo4j</div>
+                    <div class="text-xs text-gray-500">Graph Database</div>
+                </div>
+                <div class="text-center p-4 bg-white dark:bg-dark-200 rounded-xl">
+                    <i class="fas fa-robot text-3xl text-primary-600 mb-2"></i>
+                    <div class="font-semibold">Ollama</div>
+                    <div class="text-xs text-gray-500">Local LLM</div>
+                </div>
+                <div class="text-center p-4 bg-white dark:bg-dark-200 rounded-xl">
+                    <i class="fas fa-server text-3xl text-primary-600 mb-2"></i>
+                    <div class="font-semibold">FastAPI</div>
+                    <div class="text-xs text-gray-500">Backend</div>
+                </div>
+                <div class="text-center p-4 bg-white dark:bg-dark-200 rounded-xl">
+                    <i class="fas fa-paint-brush text-3xl text-primary-600 mb-2"></i>
+                    <div class="font-semibold">Tailwind CSS</div>
+                    <div class="text-xs text-gray-500">Frontend</div>
+                </div>
+                <div class="text-center p-4 bg-white dark:bg-dark-200 rounded-xl">
+                    <i class="fas fa-chart-network text-3xl text-primary-600 mb-2"></i>
+                    <div class="font-semibold">D3.js</div>
+                    <div class="text-xs text-gray-500">Visualization</div>
+                </div>
+                <div class="text-center p-4 bg-white dark:bg-dark-200 rounded-xl">
+                    <i class="fas fa-bolt text-3xl text-primary-600 mb-2"></i>
+                    <div class="font-semibold">Alpine.js</div>
+                    <div class="text-xs text-gray-500">Reactivity</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="glass dark:glass-dark rounded-2xl p-8 text-center">
+            <h2 class="text-2xl font-bold mb-4">Ready to Get Started?</h2>
+            <p class="text-gray-600 dark:text-gray-400 mb-6">Join thousands of users building intelligent knowledge systems</p>
+            <a href="/register" class="inline-block px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white rounded-xl font-semibold shadow-xl hover:shadow-2xl transform hover:scale-105 transition">
+                Start Free Trial
+            </a>
+        </div>
+    </div>
+</div>
+
+{% include "components/footer.html" %}
+{% endblock %}

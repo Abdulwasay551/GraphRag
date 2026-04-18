@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+{% block title %}Privacy Policy - GraphRAG{% endblock %}
+{% block content %}
+{% include "components/navbar_public.html" %}
+
+<div class="min-h-screen bg-gray-50 dark:bg-dark-100 px-4 py-16">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-4xl font-bold mb-4">Privacy Policy</h1>
+        <p class="text-gray-600 dark:text-gray-400 mb-8">Last updated: January 27, 2026</p>
+        
+        <div class="glass dark:glass-dark rounded-2xl p-8 mb-6">
+            <h2 class="text-2xl font-bold mb-4">1. Introduction</h2>
+            <p class="text-gray-600 dark:text-gray-400">
+                GraphRAG ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our service.
+            </p>
+        </div>
+        
+        <div class="glass dark:glass-dark rounded-2xl p-8 mb-6">
+            <h2 class="text-2xl font-bold mb-4">2. Information We Collect</h2>
+            
+            <h3 class="text-xl font-bold mb-3 mt-4">Account Information</h3>
+            <ul class="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-2 ml-4 mb-4">
+                <li>Full name</li>
+                <li>Email address</li>
+                <li>Password (encrypted)</li>
+                <li>Account preferences</li>
+            </ul>
+            
+            <h3 class="text-xl font-bold mb-3 mt-4">Usage Data</h3>
+            <ul class="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-2 ml-4 mb-4">
+                <li>IP address</li>
+                <li>Browser type and version</li>
+                <li>Pages visited and features used</li>
+                <li>Time and date of visits</li>
+                <li>Query history</li>
+            </ul>
+            
+            <h3 class="text-xl font-bold mb-3 mt-4">User Content</h3>
+            <ul class="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-2 ml-4">
+                <li>Documents you upload</li>
+                <li>Knowledge graphs you create</li>
+                <li>Custom schemas and configurations</li>
+                <li>Queries and conversations</li>
+            </ul>
+        </div>
+        
+        <div class="glass dark:glass-dark rounded-2xl p-8 mb-6">
+            <h2 class="text-2xl font-bold mb-4">3. How We Use Your Information</h2>
+            <p class="text-gray-600 dark:text-gray-400 mb-4">We use collected information to:</p>
+            <ul class="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-2 ml-4">
+                <li>Provide and maintain the Service</li>
+                <li>Process your documents and create knowledge graphs</li>
+                <li>Respond to your queries using AI</li>
+                <li>Send important notifications about your account</li>
+                <li>Improve and optimize the Service</li>
+                <li>Detect and prevent fraud or abuse</li>
+                <li>Comply with legal obligations</li>
+                <li>Send marketing communications (with your consent)</li>
+            </ul>
+        </div>
+        
+        <div class="glass dark:glass-dark rounded-2xl p-8 mb-6">
+            <h2 class="text-2xl font-bold mb-4">4. AI Processing</h2>
+            <p class="text-gray-600 dark:text-gray-400 mb-4">
+                <strong>Local Processing:</strong> We use locally hosted AI models (Ollama) to process your documents and queries. Your data is NOT sent to external AI services.
+            </p>
+            <p class="text-gray-600 dark:text-gray-400 mb-4">
+                <strong>Entity Extraction:</strong> AI models analyze your documents to extract entities, relationships, and concepts. This processing happens on our servers.
+            </p>
+            <p class="text-gray-600 dark:text-gray-400">
+                <strong>Query Responses:</strong> When you ask questions, AI models use your knowledge graph data to generate responses.
+            </p>
+        </div>
+        
+        <div class="glass dark:glass-dark rounded-2xl p-8 mb-6">
+            <h2 class="text-2xl font-bold mb-4">5. Data Sharing and Disclosure</h2>
+            <p class="text-gray-600 dark:text-gray-400 mb-4">
+                We do NOT sell your personal information. We may share your information only in these circumstances:
+            </p>
+            <ul class="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-2 ml-4">
+                <li><strong>With your consent:</strong> When you explicitly authorize sharing</li>
+                <li><strong>Service providers:</strong> Third parties who help operate our service (hosting, analytics)</li>
+                <li><strong>Legal requirements:</strong> When required by law or to protect rights and safety</li>
+                <li><strong>Business transfers:</strong> In case of merger, acquisition, or asset sale</li>
+                <li><strong>Team members:</strong> With workspace collaborators you invite</li>
+            </ul>
+        </div>
+        
+        <div class="glass dark:glass-dark rounded-2xl p-8 mb-6">
+            <h2 class="text-2xl font-bold mb-4">6. Data Security</h2>
+            <p class="text-gray-600 dark:text-gray-400 mb-4">
+                We implement appropriate security measures to protect your information:
+            </p>
+            <ul class="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-2 ml-4">
+                <li>Encryption in transit (HTTPS/TLS)</li>
+                <li>Encrypted password storage (bcrypt)</li>
+                <li>Secure authentication (JWT tokens)</li>
+                <li>Regular security audits</li>
+                <li>Access controls and monitoring</li>
+                <li>Isolated workspace data</li>
+            </ul>
+            <p class="text-gray-600 dark:text-gray-400 mt-4">
+                However, no method of transmission over the Internet is 100% secure. We cannot guarantee absolute security.
+            </p>
+        </div>
+        
+        <div class="glass dark:glass-dark rounded-2xl p-8 mb-6">
+            <h2 class="text-2xl font-bold mb-4">7. Data Retention</h2>
+            <p class="text-gray-600 dark:text-gray-400 mb-4">
+                We retain your information for as long as necessary to provide the Service or as required by law:
+            </p>
+            <ul class="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-2 ml-4">
+                <li><strong>Account data:</strong> Retained while your account is active</li>
+                <li><strong>Documents and graphs:</strong> Retained until you delete them</li>
+                <li><strong>Usage logs:</strong> Retained for 90 days</li>
+                <li><strong>Billing records:</strong> Retained for 7 years (legal requirement)</li>
+            </ul>
+        </div>
+        
+        <div class="glass dark:glass-dark rounded-2xl p-8 mb-6">
+            <h2 class="text-2xl font-bold mb-4">8. Your Rights</h2>
+            <p class="text-gray-600 dark:text-gray-400 mb-4">You have the right to:</p>
+            <ul class="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-2 ml-4">
+                <li><strong>Access:</strong> Request a copy of your personal data</li>
+                <li><strong>Correction:</strong> Update inaccurate information</li>
+                <li><strong>Deletion:</strong> Request deletion of your data</li>
+                <li><strong>Export:</strong> Download your data in standard formats</li>
+                <li><strong>Opt-out:</strong> Unsubscribe from marketing emails</li>
+                <li><strong>Restrict processing:</strong> Limit how we use your data</li>
+                <li><strong>Data portability:</strong> Transfer your data to another service</li>
+            </ul>
+            <p class="text-gray-600 dark:text-gray-400 mt-4">
+                To exercise these rights, contact us at <a href="mailto:privacy@graphrag.com" class="text-primary-600 hover:text-primary-700 font-semibold">privacy@graphrag.com</a>
+            </p>
+        </div>
+        
+        <div class="glass dark:glass-dark rounded-2xl p-8 mb-6">
+            <h2 class="text-2xl font-bold mb-4">9. Cookies and Tracking</h2>
+            <p class="text-gray-600 dark:text-gray-400 mb-4">
+                We use cookies and similar technologies to:
+            </p>
+            <ul class="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-2 ml-4">
+                <li>Keep you logged in</li>
+                <li>Remember your preferences (dark mode)</li>
+                <li>Analyze service usage</li>
+                <li>Improve user experience</li>
+            </ul>
+            <p class="text-gray-600 dark:text-gray-400 mt-4">
+                You can control cookies through your browser settings.
+            </p>
+        </div>
+        
+        <div class="glass dark:glass-dark rounded-2xl p-8 mb-6">
+            <h2 class="text-2xl font-bold mb-4">10. Children's Privacy</h2>
+            <p class="text-gray-600 dark:text-gray-400">
+                Our Service is not intended for children under 13. We do not knowingly collect information from children under 13. If you believe we have collected such information, please contact us immediately.
+            </p>
+        </div>
+        
+        <div class="glass dark:glass-dark rounded-2xl p-8 mb-6">
+            <h2 class="text-2xl font-bold mb-4">11. International Data Transfers</h2>
+            <p class="text-gray-600 dark:text-gray-400">
+                Your information may be transferred to and processed in countries other than your own. We ensure appropriate safeguards are in place to protect your information in compliance with this Privacy Policy.
+            </p>
+        </div>
+        
+        <div class="glass dark:glass-dark rounded-2xl p-8 mb-6">
+            <h2 class="text-2xl font-bold mb-4">12. Changes to This Policy</h2>
+            <p class="text-gray-600 dark:text-gray-400">
+                We may update this Privacy Policy from time to time. We will notify you of significant changes by email or through the Service. Your continued use after changes constitutes acceptance.
+            </p>
+        </div>
+        
+        <div class="glass dark:glass-dark rounded-2xl p-8 mb-6">
+            <h2 class="text-2xl font-bold mb-4">13. Contact Us</h2>
+            <p class="text-gray-600 dark:text-gray-400">
+                For privacy-related questions or concerns:
+            </p>
+            <p class="text-gray-600 dark:text-gray-400 mt-4">
+                Email: <a href="mailto:privacy@graphrag.com" class="text-primary-600 hover:text-primary-700 font-semibold">privacy@graphrag.com</a><br>
+                Data Protection Officer: <a href="mailto:dpo@graphrag.com" class="text-primary-600 hover:text-primary-700 font-semibold">dpo@graphrag.com</a><br>
+                Address: 123 AI Street, Tech Valley, CA 94000
+            </p>
+        </div>
+    </div>
+</div>
+
+{% include "components/footer.html" %}
+{% endblock %}

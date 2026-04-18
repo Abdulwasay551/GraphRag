@@ -1,0 +1,378 @@
+{% extends "base.html" %}
+{% block title %}Knowledge Graph Schema - GraphRAG{% endblock %}
+{% block content %}
+{% include "components/navbar_auth.html" %}
+
+<div class="min-h-screen bg-gray-50 dark:bg-dark-100" x-data="schemaData()">
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold mb-2">Knowledge Graph Schema</h1>
+            <p class="text-gray-600 dark:text-gray-400">Explore your graph structure and relationships</p>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- Schema Visualization -->
+            <div class="lg:col-span-3">
+                <div class="glass dark:glass-dark rounded-2xl p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-bold">Schema Diagram</h2>
+                        <div class="flex gap-2">
+                            <button @click="loadSchema"
+                                class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition">
+                                <i class="fas fa-sync-alt mr-2"></i>Refresh
+                            </button>
+                            <button @click="exportSchema"
+                                class="px-4 py-2 border-2 border-gray-200 dark:border-dark-300 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-200 transition">
+                                <i class="fas fa-download mr-2"></i>Export
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="schema-viz" style="height: 600px; width: 100%; border: 2px solid #e5e7eb; border-radius: 12px; position: relative;"
+                        class="dark:border-dark-300 bg-white dark:bg-dark-200">
+                        <template x-if="loading">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="text-center">
+                                    <i class="fas fa-spinner fa-spin text-4xl text-primary-600 mb-4"></i>
+                                    <p class="text-gray-600 dark:text-gray-400">Loading schema...</p>
+                                </div>
+                            </div>
+                        </template>
+                        <template x-if="!loading && error">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="text-center">
+                                    <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
+                                    <p class="text-red-600" x-text="error"></p>
+                                    <button @click="loadSchema"
+                                        class="mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg">
+                                        Try Again
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+                
+                <!-- Statistics -->
+                <div class="grid grid-cols-3 gap-4 mt-6">
+                    <div class="glass dark:glass-dark rounded-xl p-6 text-center">
+                        <div class="text-3xl font-bold text-primary-600 mb-2" x-text="stats.totalNodes"></div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">Total Nodes</div>
+                    </div>
+                    <div class="glass dark:glass-dark rounded-xl p-6 text-center">
+                        <div class="text-3xl font-bold text-primary-600 mb-2" x-text="stats.totalRelationships"></div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">Relationships</div>
+                    </div>
+                    <div class="glass dark:glass-dark rounded-xl p-6 text-center">
+                        <div class="text-3xl font-bold text-primary-600 mb-2" x-text="stats.nodeTypes"></div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">Node Types</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="space-y-6">
+                <!-- Node Types -->
+                <div class="glass dark:glass-dark rounded-xl p-6">
+                    <h3 class="font-bold mb-4 flex items-center">
+                        <i class="fas fa-circle-nodes text-primary-600 mr-2"></i>
+                        Node Types
+                    </h3>
+                    <template x-if="loading">
+                        <div class="text-center py-4">
+                            <i class="fas fa-spinner fa-spin text-primary-600"></i>
+                        </div>
+                    </template>
+                    <template x-if="!loading">
+                        <div class="space-y-2 max-h-60 overflow-y-auto">
+                            <template x-for="nodeType in nodeTypes" :key="nodeType.label">
+                                <div class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-200">
+                                    <div class="flex items-center">
+                                        <div class="w-3 h-3 rounded-full mr-2" :style="`background-color: ${nodeType.color}`"></div>
+                                        <span class="text-sm" x-text="nodeType.label"></span>
+                                    </div>
+                                    <span class="text-xs text-gray-500" x-text="nodeType.count"></span>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+                
+                <!-- Relationship Types -->
+                <div class="glass dark:glass-dark rounded-xl p-6">
+                    <h3 class="font-bold mb-4 flex items-center">
+                        <i class="fas fa-link text-primary-600 mr-2"></i>
+                        Relationship Types
+                    </h3>
+                    <template x-if="loading">
+                        <div class="text-center py-4">
+                            <i class="fas fa-spinner fa-spin text-primary-600"></i>
+                        </div>
+                    </template>
+                    <template x-if="!loading">
+                        <div class="space-y-2 max-h-60 overflow-y-auto">
+                            <template x-for="relType in relationshipTypes" :key="relType.type">
+                                <div class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-200">
+                                    <span class="text-sm" x-text="relType.type"></span>
+                                    <span class="text-xs text-gray-500" x-text="relType.count"></span>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+                
+                <!-- Legend -->
+                <div class="glass dark:glass-dark rounded-xl p-6">
+                    <h3 class="font-bold mb-4">Legend</h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 rounded-full bg-blue-500 mr-3"></div>
+                            <span>Entity Node</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-8 h-0.5 bg-gray-400 mr-3"></div>
+                            <span>Relationship</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 rounded-full border-4 border-primary-600 mr-3"></div>
+                            <span>Selected</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Actions -->
+                <div class="glass dark:glass-dark rounded-xl p-6">
+                    <h3 class="font-bold mb-4">Actions</h3>
+                    <div class="space-y-2">
+                        <button @click="viewInGraph"
+                            class="w-full px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition text-sm">
+                            <i class="fas fa-project-diagram mr-2"></i>View in Graph
+                        </button>
+                        <button @click="downloadCypher"
+                            class="w-full px-4 py-2 border-2 border-gray-200 dark:border-dark-300 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-200 transition text-sm">
+                            <i class="fas fa-code mr-2"></i>Get Cypher
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+function schemaData() {
+    return {
+        loading: true,
+        error: null,
+        workspaceId: new URLSearchParams(window.location.search).get('workspace'),
+        stats: {
+            totalNodes: 0,
+            totalRelationships: 0,
+            nodeTypes: 0
+        },
+        nodeTypes: [],
+        relationshipTypes: [],
+        schemaData: null,
+        
+        async init() {
+            await this.loadSchema();
+        },
+        
+        async loadSchema() {
+            this.loading = true;
+            this.error = null;
+            
+            try {
+                const token = localStorage.getItem('access_token');
+                const url = this.workspaceId 
+                    ? `/api/graph/stats?workspace_id=${this.workspaceId}`
+                    : '/api/graph/stats';
+                
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.status === 401) {
+                    window.location.href = '/login';
+                    return;
+                }
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load schema');
+                }
+                
+                const data = await response.json();
+                this.schemaData = data;
+                
+                // Update stats
+                this.stats.totalNodes = data.total_nodes || 0;
+                this.stats.totalRelationships = data.total_relationships || 0;
+                this.stats.nodeTypes = Object.keys(data.node_labels || {}).length;
+                
+                // Process node types
+                this.nodeTypes = Object.entries(data.node_labels || {}).map(([label, count], index) => ({
+                    label,
+                    count,
+                    color: this.getColor(index)
+                }));
+                
+                // Process relationship types
+                this.relationshipTypes = Object.entries(data.relationship_types || {}).map(([type, count]) => ({
+                    type,
+                    count
+                }));
+                
+                // Render visualization
+                this.renderSchema();
+                
+            } catch (error) {
+                console.error('Schema load error:', error);
+                this.error = error.message;
+            } finally {
+                this.loading = false;
+            }
+        },
+        
+        renderSchema() {
+            const container = document.getElementById('schema-viz');
+            container.innerHTML = '';
+            
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+            
+            const svg = d3.select('#schema-viz')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height);
+            
+            // Create nodes from node types
+            const nodes = this.nodeTypes.map((nt, i) => ({
+                id: nt.label,
+                label: nt.label,
+                count: nt.count,
+                color: nt.color,
+                x: width / 2 + Math.cos(i * 2 * Math.PI / this.nodeTypes.length) * 150,
+                y: height / 2 + Math.sin(i * 2 * Math.PI / this.nodeTypes.length) * 150
+            }));
+            
+            // Create links from relationship types
+            const links = this.relationshipTypes.map(rt => {
+                const parts = rt.type.split('_TO_');
+                if (parts.length === 2) {
+                    return {
+                        source: nodes.find(n => n.id === parts[0])?.id || nodes[0]?.id,
+                        target: nodes.find(n => n.id === parts[1])?.id || nodes[1]?.id,
+                        type: rt.type,
+                        count: rt.count
+                    };
+                }
+                return null;
+            }).filter(l => l !== null);
+            
+            // Draw links
+            svg.selectAll('.link')
+                .data(links)
+                .enter()
+                .append('line')
+                .attr('class', 'link')
+                .attr('x1', d => nodes.find(n => n.id === d.source)?.x || 0)
+                .attr('y1', d => nodes.find(n => n.id === d.source)?.y || 0)
+                .attr('x2', d => nodes.find(n => n.id === d.target)?.x || 0)
+                .attr('y2', d => nodes.find(n => n.id === d.target)?.y || 0)
+                .attr('stroke', '#9ca3af')
+                .attr('stroke-width', 2)
+                .attr('marker-end', 'url(#arrowhead)');
+            
+            // Add arrowhead marker
+            svg.append('defs').append('marker')
+                .attr('id', 'arrowhead')
+                .attr('viewBox', '-0 -5 10 10')
+                .attr('refX', 25)
+                .attr('refY', 0)
+                .attr('orient', 'auto')
+                .attr('markerWidth', 6)
+                .attr('markerHeight', 6)
+                .append('path')
+                .attr('d', 'M 0,-5 L 10,0 L 0,5')
+                .attr('fill', '#9ca3af');
+            
+            // Draw nodes
+            const nodeGroups = svg.selectAll('.node')
+                .data(nodes)
+                .enter()
+                .append('g')
+                .attr('class', 'node')
+                .attr('transform', d => `translate(${d.x},${d.y})`);
+            
+            nodeGroups.append('circle')
+                .attr('r', d => Math.sqrt(d.count) * 3 + 20)
+                .attr('fill', d => d.color)
+                .attr('stroke', '#fff')
+                .attr('stroke-width', 3);
+            
+            nodeGroups.append('text')
+                .attr('text-anchor', 'middle')
+                .attr('dy', '.3em')
+                .attr('fill', '#fff')
+                .attr('font-weight', 'bold')
+                .text(d => d.label);
+            
+            nodeGroups.append('text')
+                .attr('text-anchor', 'middle')
+                .attr('dy', '1.5em')
+                .attr('fill', '#fff')
+                .attr('font-size', '10px')
+                .text(d => d.count);
+        },
+        
+        getColor(index) {
+            const colors = [
+                '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', 
+                '#3b82f6', '#ef4444', '#14b8a6', '#f97316'
+            ];
+            return colors[index % colors.length];
+        },
+        
+        exportSchema() {
+            const dataStr = JSON.stringify(this.schemaData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'schema.json';
+            link.click();
+            URL.revokeObjectURL(url);
+        },
+        
+        viewInGraph() {
+            const url = this.workspaceId 
+                ? `/workspace/${this.workspaceId}`
+                : '/query';
+            window.location.href = url;
+        },
+        
+        downloadCypher() {
+            let cypher = '// Node Labels\n';
+            this.nodeTypes.forEach(nt => {
+                cypher += `MATCH (n:${nt.label}) RETURN count(n) // ${nt.count}\n`;
+            });
+            cypher += '\n// Relationship Types\n';
+            this.relationshipTypes.forEach(rt => {
+                cypher += `MATCH ()-[r:${rt.type}]->() RETURN count(r) // ${rt.count}\n`;
+            });
+            
+            const blob = new Blob([cypher], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'schema.cypher';
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,348 @@
+{% extends "base.html" %}
+{% block title %}Workspace - GraphRAG{% endblock %}
+{% block content %}
+{% include "components/navbar_auth.html" %}
+
+<div class="min-h-screen bg-gray-50 dark:bg-dark-100" x-data="workspaceData()" x-cloak>
+    <div class="border-b border-gray-200 dark:border-dark-300">
+        <div class="max-w-7xl mx-auto px-4 py-6">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h1 class="text-3xl font-bold mb-2" x-text="workspace.name">Loading...</h1>
+                    <p class="text-gray-600 dark:text-gray-400" x-text="workspace.description"></p>
+                </div>
+                <div class="flex gap-3">
+                    <a :href="`/upload?workspace=${workspaceId}`"
+                        class="px-4 py-2 glass dark:glass-dark rounded-lg font-semibold hover:shadow-lg transition flex items-center">
+                        <i class="fas fa-upload mr-2"></i>
+                        Upload
+                    </a>
+                    <button @click="showExport = true"
+                        class="px-4 py-2 glass dark:glass-dark rounded-lg font-semibold hover:shadow-lg transition flex items-center">
+                        <i class="fas fa-download mr-2"></i>
+                        Export
+                    </button>
+                </div>
+            </div>
+            
+            <div class="flex gap-6">
+                <div class="text-center">
+                    <div class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent" x-text="stats.nodes">0</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center justify-center gap-1">
+                        <i class="fas fa-circle text-blue-500 text-xs"></i>
+                        Nodes
+                    </div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent" x-text="stats.relationships">0</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center justify-center gap-1">
+                        <i class="fas fa-project-diagram text-purple-500 text-xs"></i>
+                        Relationships
+                    </div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent" x-text="stats.documents">0</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center justify-center gap-1">
+                        <i class="fas fa-file text-green-500 text-xs"></i>
+                        Documents
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 space-y-6">
+                <div class="glass dark:glass-dark rounded-2xl p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-bold">Knowledge Graph</h2>
+                        <div class="flex gap-2">
+                            <button @click="zoomIn" class="p-2 glass dark:glass-dark rounded-lg hover:shadow-lg transition">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                            <button @click="zoomOut" class="p-2 glass dark:glass-dark rounded-lg hover:shadow-lg transition">
+                                <i class="fas fa-search-minus"></i>
+                            </button>
+                            <button @click="resetZoom" class="p-2 glass dark:glass-dark rounded-lg hover:shadow-lg transition">
+                                <i class="fas fa-expand"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="graph-container" class="w-full h-96 bg-white dark:bg-dark-200 rounded-xl border-2 border-gray-200 dark:border-dark-300"></div>
+                </div>
+                
+                <div class="glass dark:glass-dark rounded-2xl p-6">
+                    <h2 class="text-xl font-bold mb-4">Recent Documents</h2>
+                    <div class="space-y-3">
+                        <template x-if="documents.length === 0">
+                            <div class="text-center py-12">
+                                <div class="w-20 h-20 rounded-full bg-gradient-to-br from-primary-100 to-primary-200 dark:from-primary-900/30 dark:to-primary-800/30 flex items-center justify-center mx-auto mb-4">
+                                    <i class="fas fa-file-upload text-4xl text-primary-600"></i>
+                                </div>
+                                <h3 class="text-lg font-bold mb-2">No Documents Yet</h3>
+                                <p class="text-gray-600 dark:text-gray-400 mb-4">Upload your first document to start building your knowledge graph</p>
+                                <a :href="`/upload?workspace=${workspaceId}`"
+                                    class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition">
+                                    <i class="fas fa-upload mr-2"></i>
+                                    Upload Document
+                                </a>
+                            </div>
+                        </template>
+                        <template x-for="(doc, index) in documents.slice(0, 5)" :key="index">
+                            <div class="flex items-center justify-between p-4 bg-white dark:bg-dark-200 rounded-lg hover:shadow-lg transition cursor-pointer">
+                                <div class="flex items-center flex-1">
+                                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center mr-3">
+                                        <i :class="getFileIcon(doc.filename)" class="text-white"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="font-semibold truncate" x-text="doc.filename"></p>
+                                        <p class="text-xs text-gray-500" x-text="formatDate(doc.uploaded_at)"></p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span :class="{
+                                        'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300': doc.status === 'completed',
+                                        'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300': doc.status === 'processing',
+                                        'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300': doc.status === 'failed'
+                                    }" class="px-2 py-1 rounded-full text-xs font-semibold" x-text="doc.status"></span>
+                                </div>
+                            </div>
+                        </template>
+                        <template x-if="documents.length > 5">
+                            <a :href="`/upload?workspace=${workspaceId}`" class="block text-center py-2 text-primary-600 hover:text-primary-700 font-semibold text-sm">
+                                View all <span x-text="documents.length"></span> documents →
+                            </a>
+                        </template>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="space-y-6">
+                <div class="glass dark:glass-dark rounded-2xl p-6">
+                    <h2 class="text-xl font-bold mb-4">Quick Actions</h2>
+                    <div class="space-y-3">
+                        <a :href="`/query?workspace=${workspaceId}`"
+                            class="flex items-center p-4 bg-white dark:bg-dark-200 rounded-lg hover:shadow-lg transition">
+                            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center mr-3">
+                                <i class="fas fa-search text-white"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold">Query Graph</p>
+                                <p class="text-xs text-gray-500">Ask questions</p>
+                            </div>
+                        </a>
+                        <a :href="`/schema?workspace=${workspaceId}`"
+                            class="flex items-center p-4 bg-white dark:bg-dark-200 rounded-lg hover:shadow-lg transition">
+                            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center mr-3">
+                                <i class="fas fa-sitemap text-white"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold">Edit Schema</p>
+                                <p class="text-xs text-gray-500">Customize types</p>
+                            </div>
+                        </a>
+                        <a :href="`/chatbot-settings?workspace=${workspaceId}`"
+                            class="flex items-center p-4 bg-white dark:bg-dark-200 rounded-lg hover:shadow-lg transition">
+                            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center mr-3">
+                                <i class="fas fa-comments text-white"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold">Chatbot Widget</p>
+                                <p class="text-xs text-gray-500">Embed on site</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="glass dark:glass-dark rounded-2xl p-6">
+                    <h2 class="text-xl font-bold mb-4">Entity Types</h2>
+                    <div class="space-y-2">
+                        <template x-if="entityTypes.length === 0">
+                            <p class="text-sm text-gray-500">No entities yet</p>
+                        </template>
+                        <template x-for="type in entityTypes" :key="type.name">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm" x-text="type.name"></span>
+                                <span class="px-2 py-1 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-full text-xs font-semibold"
+                                    x-text="type.count"></span>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+function workspaceData() {
+    return {
+        workspaceId: window.location.pathname.split('/').pop(),
+        workspace: { name: 'Loading...', description: '' },
+        stats: { nodes: 0, relationships: 0, documents: 0 },
+        documents: [],
+        entityTypes: [],
+        showExport: false,
+        
+        async init() {
+            await this.loadWorkspace();
+            await this.loadStats();
+            await this.loadDocuments();
+            await this.loadGraph();
+        },
+        
+        async loadWorkspace() {
+            try {
+                const result = await window.api.request(`/api/auth/workspaces/${this.workspaceId}`);
+                this.workspace = result;
+            } catch (error) {
+                console.error('Failed to load workspace:', error);
+                this.workspace = { name: 'Workspace', description: '' };
+            }
+        },
+        
+        async loadStats() {
+            try {
+                const result = await window.api.request(`/api/visualization/stats?workspace_id=${this.workspaceId}`);
+                this.stats = result;
+                this.entityTypes = result.entity_types || [];
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+            }
+        },
+        
+        async loadDocuments() {
+            try {
+                const result = await window.api.request(`/api/documents/list?workspace_id=${this.workspaceId}`);
+                this.documents = result.documents || [];
+            } catch (error) {
+                console.error('Failed to load documents:', error);
+            }
+        },
+        
+        async loadGraph() {
+            try {
+                const result = await window.api.request(`/api/visualization/graph?workspace_id=${this.workspaceId}&limit=50`);
+                this.renderGraph(result);
+            } catch (error) {
+                console.error('Failed to load graph:', error);
+            }
+        },
+        
+        renderGraph(data) {
+            const container = d3.select('#graph-container');
+            container.selectAll('*').remove();
+            
+            // Validate data
+            if (!data || !data.nodes || data.nodes.length === 0) {
+                container.append('div')
+                    .attr('class', 'flex items-center justify-center h-full text-gray-500')
+                    .html('<div class="text-center"><i class="fas fa-project-diagram text-4xl mb-2"></i><p>No graph data available yet</p></div>');
+                return;
+            }
+            
+            // Filter out nodes without IDs
+            const validNodes = data.nodes.filter(n => n && n.id);
+            const nodeIds = new Set(validNodes.map(n => n.id));
+            const validEdges = (data.edges || []).filter(e => 
+                e && e.source && e.target && nodeIds.has(e.source) && nodeIds.has(e.target)
+            );
+            
+            if (validNodes.length === 0) {
+                container.append('div')
+                    .attr('class', 'flex items-center justify-center h-full text-gray-500')
+                    .html('<div class="text-center"><i class="fas fa-project-diagram text-4xl mb-2"></i><p>No valid graph nodes found</p></div>');
+                return;
+            }
+            
+            const width = container.node().clientWidth;
+            const height = 400;
+            
+            const svg = container.append('svg')
+                .attr('width', width)
+                .attr('height', height);
+            
+            const simulation = d3.forceSimulation(validNodes)
+                .force('link', d3.forceLink(validEdges).id(d => d.id).distance(100))
+                .force('charge', d3.forceManyBody().strength(-300))
+                .force('center', d3.forceCenter(width / 2, height / 2));
+            
+            const link = svg.append('g')
+                .selectAll('line')
+                .data(validEdges)
+                .join('line')
+                .attr('stroke', '#999')
+                .attr('stroke-width', 2);
+            
+            const node = svg.append('g')
+                .selectAll('circle')
+                .data(validNodes)
+                .join('circle')
+                .attr('r', 8)
+                .attr('fill', '#a855f7')
+                .call(d3.drag()
+                    .on('start', dragstarted)
+                    .on('drag', dragged)
+                    .on('end', dragended));
+            
+            node.append('title').text(d => d.name);
+            
+            simulation.on('tick', () => {
+                link
+                    .attr('x1', d => d.source.x)
+                    .attr('y1', d => d.source.y)
+                    .attr('x2', d => d.target.x)
+                    .attr('y2', d => d.target.y);
+                
+                node
+                    .attr('cx', d => d.x)
+                    .attr('cy', d => d.y);
+            });
+            
+            function dragstarted(event) {
+                if (!event.active) simulation.alphaTarget(0.3).restart();
+                event.subject.fx = event.subject.x;
+                event.subject.fy = event.subject.y;
+            }
+            
+            function dragged(event) {
+                event.subject.fx = event.x;
+                event.subject.fy = event.y;
+            }
+            
+            function dragended(event) {
+                if (!event.active) simulation.alphaTarget(0);
+                event.subject.fx = null;
+                event.subject.fy = null;
+            }
+        },
+        
+        zoomIn() { /* Implement zoom */ },
+        zoomOut() { /* Implement zoom */ },
+        resetZoom() { /* Implement reset */ },
+        
+        getFileIcon(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            const icons = {
+                pdf: 'fas fa-file-pdf',
+                docx: 'fas fa-file-word',
+                csv: 'fas fa-file-csv',
+                xlsx: 'fas fa-file-excel',
+                json: 'fas fa-file-code',
+                md: 'fas fa-markdown',
+                html: 'fas fa-file-code'
+            };
+            return icons[ext] || 'fas fa-file';
+        },
+        
+        formatDate(date) {
+            return new Date(date).toLocaleDateString();
+        }
+    }
+}
+</script>
+{% endblock %}

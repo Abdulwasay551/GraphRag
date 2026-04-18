@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - GraphRAG{% endblock %}
+{% block content %}
+{% include "components/navbar_auth.html" %}
+
+<div class="min-h-screen bg-gray-50 dark:bg-dark-100 px-4 py-8" x-data="dashboardData()">
+    <div class="max-w-7xl mx-auto">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-3xl font-bold mb-2">Dashboard</h1>
+                <p class="text-gray-600 dark:text-gray-400">Manage your knowledge graphs</p>
+            </div>
+            <button @click="showCreateModal = true" 
+                class="px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition flex items-center">
+                <i class="fas fa-plus mr-2"></i>
+                New Workspace
+            </button>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="glass dark:glass-dark rounded-xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center">
+                        <i class="fas fa-briefcase text-white text-xl"></i>
+                    </div>
+                </div>
+                <div class="text-3xl font-bold mb-1" x-text="workspaces.length">0</div>
+                <div class="text-sm text-gray-600 dark:text-gray-400">Workspaces</div>
+            </div>
+            
+            <div class="glass dark:glass-dark rounded-xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
+                        <i class="fas fa-file text-white text-xl"></i>
+                    </div>
+                </div>
+                <div class="text-3xl font-bold mb-1" x-text="totalDocuments">0</div>
+                <div class="text-sm text-gray-600 dark:text-gray-400">Documents</div>
+            </div>
+            
+            <div class="glass dark:glass-dark rounded-xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center">
+                        <i class="fas fa-circle-nodes text-white text-xl"></i>
+                    </div>
+                </div>
+                <div class="text-3xl font-bold mb-1" x-text="totalNodes">0</div>
+                <div class="text-sm text-gray-600 dark:text-gray-400">Total Nodes</div>
+            </div>
+            
+            <div class="glass dark:glass-dark rounded-xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center">
+                        <i class="fas fa-arrows-split-up-and-left text-white text-xl"></i>
+                    </div>
+                </div>
+                <div class="text-3xl font-bold mb-1" x-text="totalRelationships">0</div>
+                <div class="text-sm text-gray-600 dark:text-gray-400">Relationships</div>
+            </div>
+        </div>
+        
+        <div x-show="error" class="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200 px-4 py-3 rounded-lg">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            <span x-text="error"></span>
+        </div>
+        
+        <template x-if="loading">
+            <div class="flex items-center justify-center py-20">
+                <i class="fas fa-spinner fa-spin text-4xl text-primary-600"></i>
+            </div>
+        </template>
+        
+        <template x-if="!loading && workspaces.length === 0">
+            <div class="glass dark:glass-dark rounded-2xl p-12 text-center">
+                <div class="w-20 h-20 rounded-full bg-gradient-to-br from-primary-100 to-primary-200 dark:from-primary-900/30 dark:to-primary-800/30 flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-briefcase text-4xl text-primary-600"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-3">No workspaces yet</h3>
+                <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">Create your first workspace to start building knowledge graphs from your documents</p>
+                <button @click="showCreateModal = true"
+                    class="px-8 py-3 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition">
+                    Create Workspace
+                </button>
+            </div>
+        </template>
+        
+        <template x-if="!loading && workspaces.length > 0">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <template x-for="workspace in workspaces" :key="workspace.id">
+                    <div class="glass dark:glass-dark rounded-xl p-6 hover:shadow-2xl transition cursor-pointer transform hover:-translate-y-1"
+                        @click="window.location.href = `/workspace/${workspace.id}`">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center">
+                                <i class="fas fa-project-diagram text-white text-xl"></i>
+                            </div>
+                            <span class="px-3 py-1 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-full text-xs font-semibold"
+                                x-text="workspace.plan || 'Free'"></span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2" x-text="workspace.name"></h3>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm mb-4" x-text="workspace.description || 'No description'"></p>
+                        <div class="flex items-center justify-between text-sm">
+                            <div class="flex items-center text-gray-600 dark:text-gray-400">
+                                <i class="fas fa-circle-nodes mr-2"></i>
+                                <span x-text="workspace.node_count || 0"></span>
+                            </div>
+                            <div class="flex items-center text-gray-600 dark:text-gray-400">
+                                <i class="fas fa-file mr-2"></i>
+                                <span x-text="workspace.document_count || 0"></span>
+                            </div>
+                            <div class="text-xs text-gray-500" x-text="formatDate(workspace.created_at)"></div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </template>
+    </div>
+    
+    <div x-show="showCreateModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50" 
+        @click.self="showCreateModal = false">
+        <div class="glass dark:glass-dark rounded-2xl p-8 max-w-md w-full" @click.stop>
+            <h2 class="text-2xl font-bold mb-6">Create Workspace</h2>
+            <form @submit.prevent="createWorkspace" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Workspace Name</label>
+                    <input type="text" x-model="newWorkspace.name" required 
+                        class="w-full px-4 py-3 bg-white dark:bg-dark-200 border-2 border-gray-200 dark:border-dark-300 rounded-xl focus:border-primary-500 focus:ring-2 focus:ring-primary-200 dark:focus:ring-primary-900/30 outline-none transition"
+                        placeholder="My Knowledge Graph">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Description (optional)</label>
+                    <textarea x-model="newWorkspace.description" rows="3"
+                        class="w-full px-4 py-3 bg-white dark:bg-dark-200 border-2 border-gray-200 dark:border-dark-300 rounded-xl focus:border-primary-500 focus:ring-2 focus:ring-primary-200 dark:focus:ring-primary-900/30 outline-none transition"
+                        placeholder="A brief description of this workspace"></textarea>
+                </div>
+                <div x-show="error" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200 px-4 py-3 rounded-lg text-sm">
+                    <i class="fas fa-exclamation-circle mr-2"></i>
+                    <span x-text="error"></span>
+                </div>
+                <div class="flex gap-3 pt-4">
+                    <button type="button" @click="showCreateModal = false"
+                        class="flex-1 px-4 py-3 border-2 border-gray-200 dark:border-dark-300 rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-dark-200 transition">
+                        Cancel
+                    </button>
+                    <button type="submit" :disabled="creatingWorkspace"
+                        class="flex-1 px-4 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition disabled:opacity-50">
+                        <span x-show="!creatingWorkspace">Create</span>
+                        <span x-show="creatingWorkspace">Creating...</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function dashboardData() {
+    return {
+        workspaces: [],
+        loading: true,
+        showCreateModal: false,
+        creatingWorkspace: false,
+        newWorkspace: { name: '', description: '' },
+        error: '',
+        totalDocuments: 0,
+        totalNodes: 0,
+        totalRelationships: 0,
+        
+        async init() {
+            await this.loadWorkspaces();
+        },
+        
+        async loadWorkspaces() {
+            try {
+                const token = localStorage.getItem('access_token');
+                if (!token) {
+                    window.location.href = '/login';
+                    return;
+                }
+                
+                const response = await fetch('/api/auth/workspaces', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.status === 401) {
+                    localStorage.removeItem('access_token');
+                    localStorage.removeItem('user_data');
+                    window.location.href = '/login';
+                    return;
+                }
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load workspaces');
+                }
+                
+                this.workspaces = await response.json();
+                this.calculateTotals();
+                this.loading = false;
+            } catch (error) {
+                console.error('Failed to load workspaces:', error);
+                this.error = 'Failed to load workspaces. Please try again.';
+                this.loading = false;
+            }
+        },
+        
+        calculateTotals() {
+            this.totalDocuments = this.workspaces.reduce((sum, w) => sum + (w.document_count || 0), 0);
+            this.totalNodes = this.workspaces.reduce((sum, w) => sum + (w.node_count || 0), 0);
+            this.totalRelationships = this.workspaces.reduce((sum, w) => sum + (w.relationship_count || 0), 0);
+        },
+        
+        async createWorkspace() {
+            if (!this.newWorkspace.name.trim()) {
+                alert('Please enter a workspace name');
+                return;
+            }
+            
+            this.creatingWorkspace = true;
+            this.error = '';
+            
+            try {
+                const token = localStorage.getItem('access_token');
+                const response = await fetch('/api/auth/workspaces', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(this.newWorkspace)
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Failed to create workspace');
+                }
+                
+                this.showCreateModal = false;
+                this.newWorkspace = { name: '', description: '' };
+                await this.loadWorkspaces();
+            } catch (error) {
+                console.error('Failed to create workspace:', error);
+                this.error = error.message || 'Failed to create workspace';
+            } finally {
+                this.creatingWorkspace = false;
+            }
+        },
+        
+        formatDate(date) {
+            return new Date(date).toLocaleDateString();
+        }
+    }
+}
+</script>
+{% endblock %}
